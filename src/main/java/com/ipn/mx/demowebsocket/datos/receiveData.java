@@ -1,7 +1,8 @@
 package com.ipn.mx.demowebsocket.datos;
 
-import com.ipn.mx.demowebsocket.basedatos.domain.entity.Mensaje;
-import com.ipn.mx.demowebsocket.basedatos.domain.repository.MessageRepository;
+import com.ipn.mx.demowebsocket.basedatos.domain.entity.Combate;
+import com.ipn.mx.demowebsocket.basedatos.domain.repository.CombateRepository;
+import com.ipn.mx.demowebsocket.basedatos.service.CombateService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,17 @@ public class receiveData {
         se delega a un contenedor o framework (en este caso, Spring), en lugar de ser controlado directamente por el desarrollador.
      */
     @Autowired
-    private MessageRepository messageRepository;
+    private CombateRepository combateRepository;
+
+    @Autowired
+    private CombateService combateService;
 
     @Getter
     private String message;
     @Getter
-    private double numericValue;
+    private int numericValue;
+
+    private Integer id = 10;
 
   //Se modifica el constructir por defecto par ejecutar el metodo
   // procesar mensaje que reciba el texto correspondiente al payload o las datos útiles
@@ -40,7 +46,7 @@ public class receiveData {
   public void processMessage(String payload) {
     this.message = payload;
     try {
-      numericValue = Double.parseDouble(message);
+      numericValue = (int) Double.parseDouble(message);
       guardarMensaje();
     } catch (NumberFormatException e) {
       System.err.println("Error: Mensaje no es número válido: " + message);
@@ -49,15 +55,16 @@ public class receiveData {
 
 
   private void guardarMensaje() {
-    Mensaje newMessage = new Mensaje();
+      Combate combate = combateService.read(id);
     // Asigna el valor numérico
-    newMessage.setValor(numericValue);
+      combate.setPuntajeCompetidorUno(numericValue);
+
+      combateService.save(combate);
     // Almacena en la BD MySQL
-    messageRepository.save(newMessage);
     System.out.println("Dato guardado en BD: " + numericValue);
   }
     /*
-    public recibirDatos(TextMessage message) {
+        public recibirDatos(TextMessage message) {
         this.mensaje = message.getPayload();
         procesarMensaje();
     }

@@ -9,5 +9,4 @@ public interface AlumnoService {
     public Alumno read(Integer id);
     public Alumno save(Alumno alumno);
     public void delete(Integer id);
-
 }

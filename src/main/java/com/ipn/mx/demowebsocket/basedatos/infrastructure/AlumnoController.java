@@ -31,6 +31,7 @@ public class AlumnoController {
     @PostMapping("/alumno")
     @ResponseStatus(HttpStatus.CREATED)
     public Alumno save(@RequestBody Alumno alumno) {
+
         return service.save(alumno);
     }
 
