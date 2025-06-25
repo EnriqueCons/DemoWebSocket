@@ -45,4 +45,5 @@ public class Alumno implements Serializable {
     @JoinColumn(name = "idPeto", nullable = false)
     private Peto peto;
 
+
 }
