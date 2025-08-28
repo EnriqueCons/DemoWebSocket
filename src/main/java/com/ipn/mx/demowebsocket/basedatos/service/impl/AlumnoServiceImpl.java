@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class AlumnoServiceImpl implements AlumnoService{
+public class AlumnoServiceImpl implements AlumnoService {
     @Autowired
     private AlumnoRepository alumnoRepository;
 

@@ -1,55 +1,42 @@
 package com.ipn.mx.demowebsocket.basedatos.infrastructure;
 
-import com.ipn.mx.demowebsocket.basedatos.domain.entity.Peto;
 import com.ipn.mx.demowebsocket.basedatos.domain.entity.PuntajeDetalle;
-import com.ipn.mx.demowebsocket.basedatos.service.PetoService;
 import com.ipn.mx.demowebsocket.basedatos.service.PuntajeDetalleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @CrossOrigin(origins = {"*"})
 @RestController
-@RequestMapping("/apiPuntajeDetalles")
+@RequestMapping("/apiPuntajes")
 public class PuntajeDetalleController {
     @Autowired
     private PuntajeDetalleService service;
 
-    @GetMapping("/puntajeDetalle")
+    @GetMapping("/puntaje")
     @ResponseStatus(HttpStatus.OK)
-    public List<PuntajeDetalle> readAll() {
-        return service.readAll();
-    }
+    public List<PuntajeDetalle> readAll() { return service.readAll(); }
 
-    @GetMapping("/puntajeDetalle/{id}")
+    @GetMapping("/puntaje/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PuntajeDetalle read(@PathVariable Integer id) {
-        PuntajeDetalle puntaje = service.read(id);
-        return puntaje;
-    }
+    public PuntajeDetalle read(@PathVariable Integer id) { return service.read(id); }
 
-    @PostMapping("/puntajeDetalle")
+    @PostMapping("/puntaje")
     @ResponseStatus(HttpStatus.CREATED)
-    public PuntajeDetalle save(@RequestBody PuntajeDetalle puntaje) {
-        return service.save(puntaje);
-    }
+    public PuntajeDetalle save(@RequestBody PuntajeDetalle pd) { return service.save(pd); }
 
-    @PutMapping("/puntajeDetalle/{id}")
+    @PutMapping("/puntaje/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public PuntajeDetalle update(@PathVariable Integer id, @RequestBody PuntajeDetalle puntaje) {
-        PuntajeDetalle puntaje1 = service.read(id);
-        puntaje1.setTipoPuntaje(puntaje.getTipoPuntaje());
-        puntaje1.setValorPuntaje(puntaje.getValorPuntaje());
-        puntaje1.setCombate(puntaje.getCombate());
-        puntaje1.setHoraRegistro(puntaje.getHoraRegistro());
-        return service.save(puntaje1);
+    public PuntajeDetalle update(@PathVariable Integer id, @RequestBody PuntajeDetalle pd) {
+        PuntajeDetalle p = service.read(id);
+        p.setCombate(pd.getCombate());
+        p.setAlumno(pd.getAlumno());
+        p.setValorPuntaje(pd.getValorPuntaje());
+        return service.save(p);
     }
 
-    @DeleteMapping("/puntajeDetalle/{id}")
+    @DeleteMapping("/puntaje/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Integer id) {
-        service.delete(id);
-    }
+    public void delete(@PathVariable Integer id) { service.delete(id); }
 }

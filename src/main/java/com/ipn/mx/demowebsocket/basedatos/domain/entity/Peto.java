@@ -1,16 +1,12 @@
 package com.ipn.mx.demowebsocket.basedatos.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "Peto")
@@ -21,8 +17,11 @@ public class Peto implements Serializable {
    @Column(name = "idPeto", nullable = false)
    private Integer idPeto;
 
-   @Column(name = "numeroPeto")
-   private int numeroPeto;
+   @Column(name = "numeroPeto", length = 10)
+   private String numeroPeto;
 
-
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "idAreaCombate",
+           foreignKey = @ForeignKey(name = "fk_peto_area"))
+   private AreaCombate areaCombate;
 }

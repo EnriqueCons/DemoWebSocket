@@ -11,7 +11,6 @@ import java.util.List;
 
 @Service
 public class CombateServiceImpl implements CombateService {
-
     @Autowired
     private CombateRepository combateRepository;
 
@@ -38,6 +37,4 @@ public class CombateServiceImpl implements CombateService {
     public void delete(Integer id) {
         combateRepository.deleteById(id);
     }
-
-
 }

@@ -10,8 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class PuntajeDetalleImpl implements PuntajeDetalleService {
-
+public class PuntajeDetalleServiceImpl implements PuntajeDetalleService {
     @Autowired
     private PuntajeDetalleRepository puntajeDetalleRepository;
 
@@ -35,8 +34,7 @@ public class PuntajeDetalleImpl implements PuntajeDetalleService {
 
     @Override
     @Transactional
-    public void delete(Integer id){
+    public void delete(Integer id) {
         puntajeDetalleRepository.deleteById(id);
     }
 }
-

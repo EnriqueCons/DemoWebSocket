@@ -1,21 +1,17 @@
 package com.ipn.mx.demowebsocket.basedatos.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "Alumno")
+@Entity @Table(name = "Alumno")
 public class Alumno implements Serializable {
 
     @Id
@@ -23,27 +19,32 @@ public class Alumno implements Serializable {
     @Column(name = "idAlumno", nullable = false)
     private Integer idAlumno;
 
-    @Column(name = "nombreAlumno", nullable = false, length = 50)
+    @Column(name = "nombreAlumno", length = 100)
     private String nombreAlumno;
 
-    @Column(name = "paternoAlumno", nullable = false, length = 50)
+    @Column(name = "paternoAlumno", length = 100)
     private String paternoAlumno;
 
-    @Column(name = "maternoAlumno", nullable = false, length = 50)
+    @Column(name = "maternoAlumno", length = 100)
     private String maternoAlumno;
 
-    @Column(name = "sexo", nullable = false, length = 10)
+    @Column(name = "fechaNacimiento")
+    private LocalDate fechaNacimiento;
+
+    @Column(name = "sexo", length = 10)
     private String sexo;
 
-    @Column(name = "fechaNacimiento", nullable = false)
-    private Date fechaNacimiento;
-
-    @Column(name = "peso", nullable = false)
+    @Column(name = "peso", precision = 5, scale = 2)
     private BigDecimal peso;
 
-    @OneToOne
-    @JoinColumn(name = "idPeto", nullable = false)
-    private Peto peto;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idCategoria",
+            foreignKey = @ForeignKey(name = "fk_alumno_categoria"))
+    private Categoria categoria;
 
+    @OneToMany(mappedBy = "alumno", fetch = FetchType.LAZY)
+    private List<PuntajeDetalle> puntajes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "alumno", fetch = FetchType.LAZY)
+    private List<Participacion> participaciones = new ArrayList<>();
 }

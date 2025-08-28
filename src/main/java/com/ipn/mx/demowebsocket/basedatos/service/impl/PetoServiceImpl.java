@@ -11,32 +11,30 @@ import java.util.List;
 
 @Service
 public class PetoServiceImpl implements PetoService {
-
     @Autowired
     private PetoRepository petoRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public List<Peto> readAll(){
+    public List<Peto> readAll() {
         return petoRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Peto read(Integer id){
+    public Peto read(Integer id) {
         return petoRepository.findById(id).orElse(null);
     }
 
     @Override
     @Transactional
-    public Peto save(Peto peto){
+    public Peto save(Peto peto) {
         return petoRepository.save(peto);
     }
 
     @Override
     @Transactional
-    public void delete(Integer id){
+    public void delete(Integer id) {
         petoRepository.deleteById(id);
     }
-
 }

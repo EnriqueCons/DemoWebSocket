@@ -2,55 +2,52 @@ package com.ipn.mx.demowebsocket.basedatos.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.io.Serializable;
-import java.time.LocalTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "Combate")
 public class Combate implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idCombate", nullable = false)
     private Integer idCombate;
 
-    @Column(name = "horaCombate", nullable = false)
-    private LocalTime horaCombate;
+    @Column(name = "numeroRound")
+    private Integer numeroRound;
 
-    @Column(name = "estado", length = 20, nullable = false)
+    @Column(name = "duracionRound")
+    private LocalTime duracionRound;
+
+    @Column(name = "duracionDescanso")
+    private LocalTime duracionDescanso;
+
+    @Column(name = "horaCombate")
+    private LocalDateTime horaCombate;
+
+    @Column(name = "contraseñaCombate", length = 255)
+    private String contraseñaCombate;
+
+    @Column(name = "estado", length = 50)
     private String estado;
 
-    @Column(name = "duracionRound", nullable = false)
-    private int duracionRound;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idAreaCombate",
+            foreignKey = @ForeignKey(name = "fk_combate_area"))
+    private AreaCombate areaCombate;
 
-    @Column(name = "numeroRound", nullable = false)
-    private int numeroRound;
+    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY)
+    private List<PuntajeDetalle> puntajes = new ArrayList<>();
 
-    @Column(name = "duracionDescanso", nullable = false)
-    private int duracionDescanso;
+    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY)
+    private List<Participacion> participaciones = new ArrayList<>();
 
-    @Column(name = "puntajeCompetidorUno", nullable = false)
-    private int puntajeCompetidorUno;
-
-    @Column(name = "puntajeCompetidorDos", nullable = false)
-    private int puntajeCompetidorDos;
-
-    @Column(name = "puntajeTotal", nullable = false)
-    private int puntajeTotal;
-
-    @Column(name = "contraseniaCombate", length = 50, nullable = false)
-    private String contraseniaCombate;
-
-    @OneToMany
-    @JoinColumn(name = "idAlumno", nullable = false)
-    private List<Alumno> alumnos;
-
-
-
-
+    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY)
+    private List<CombateJuez> combateJueces = new ArrayList<>();
 }
