@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface PuntajeDetalleService {
     List<PuntajeDetalle> readAll();
-    PuntajeDetalle read(Integer id);
+    PuntajeDetalle read(Long id);
     PuntajeDetalle save(PuntajeDetalle puntajeDetalle);
-    void delete(Integer id);
+    void delete(Long id);
 }

@@ -22,7 +22,7 @@ public class PuntajeDetalleServiceImpl implements PuntajeDetalleService {
 
     @Override
     @Transactional(readOnly = true)
-    public PuntajeDetalle read(Integer id) {
+    public PuntajeDetalle read(Long id) {
         return puntajeDetalleRepository.findById(id).orElse(null);
     }
 
@@ -34,7 +34,7 @@ public class PuntajeDetalleServiceImpl implements PuntajeDetalleService {
 
     @Override
     @Transactional
-    public void delete(Integer id) {
+    public void delete(Long id) {
         puntajeDetalleRepository.deleteById(id);
     }
 }

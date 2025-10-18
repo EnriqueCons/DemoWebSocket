@@ -1,12 +1,14 @@
 package com.ipn.mx.demowebsocket.basedatos.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.io.Serializable;
 import java.time.*;
 import java.util.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,6 +21,7 @@ public class Combate implements Serializable {
     @Column(name = "idCombate", nullable = false)
     private Integer idCombate;
 
+    // ... (otros campos se quedan igual)
     @Column(name = "numeroRound")
     private Integer numeroRound;
 
@@ -31,8 +34,8 @@ public class Combate implements Serializable {
     @Column(name = "horaCombate")
     private LocalDateTime horaCombate;
 
-    @Column(name = "contraseñaCombate", length = 255)
-    private String contraseñaCombate;
+    @Column(name = "contrasenaCombate", length = 255)
+    private String contrasenaCombate;
 
     @Column(name = "estado", length = 50)
     private String estado;
@@ -42,12 +45,16 @@ public class Combate implements Serializable {
             foreignKey = @ForeignKey(name = "fk_combate_area"))
     private AreaCombate areaCombate;
 
-    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY)
+    // --- CORRECCIONES ---
+    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("combate-puntajes")
     private List<PuntajeDetalle> puntajes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference("combate-participaciones")
     private List<Participacion> participaciones = new ArrayList<>();
 
-    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference("combate-jueces")
     private List<CombateJuez> combateJueces = new ArrayList<>();
 }

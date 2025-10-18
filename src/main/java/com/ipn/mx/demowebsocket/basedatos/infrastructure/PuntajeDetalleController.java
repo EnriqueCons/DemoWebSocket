@@ -20,7 +20,7 @@ public class PuntajeDetalleController {
 
     @GetMapping("/puntaje/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PuntajeDetalle read(@PathVariable Integer id) { return service.read(id); }
+    public PuntajeDetalle read(@PathVariable Long id) { return service.read(id); }
 
     @PostMapping("/puntaje")
     @ResponseStatus(HttpStatus.CREATED)
@@ -28,7 +28,7 @@ public class PuntajeDetalleController {
 
     @PutMapping("/puntaje/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public PuntajeDetalle update(@PathVariable Integer id, @RequestBody PuntajeDetalle pd) {
+    public PuntajeDetalle update(@PathVariable Long id, @RequestBody PuntajeDetalle pd) {
         PuntajeDetalle p = service.read(id);
         p.setCombate(pd.getCombate());
         p.setAlumno(pd.getAlumno());
@@ -38,5 +38,5 @@ public class PuntajeDetalleController {
 
     @DeleteMapping("/puntaje/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Integer id) { service.delete(id); }
+    public void delete(@PathVariable Long id) { service.delete(id); }
 }

@@ -37,4 +37,12 @@ public class CombateServiceImpl implements CombateService {
     public void delete(Integer id) {
         combateRepository.deleteById(id);
     }
+
+    @Override
+    public Long createNewCombatForRed() {
+        // Aquí persistes Combate en BD con estado EN_CURSO, lado rojo “pendiente”, etc.
+        // return combateRepository.save(...).getId();
+        // Ejemplo stub:
+        return System.currentTimeMillis(); // <— reemplaza por ID real de BD
+    }
 }

@@ -1,33 +1,36 @@
 package com.ipn.mx.demowebsocket.servidor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ipn.mx.demowebsocket.servidor.PendingConnectionRegistry;
+import com.ipn.mx.demowebsocket.basedatos.service.ScoreService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
-  //Se inyecta el componente webSocketHandler
-  @Autowired
-  private WebSocketHandler webSocketHandler;
 
-  /*
-    Se modifica la linea  registry.addHandler(webSocketHandler(), "/ws").setAllowedOrigins("*");
-   */
-  @Override
-  public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    registry.addHandler(webSocketHandler, "/ws").setAllowedOrigins("*");
-  }
-  /*
+    private final ScoreService scoreService;
+    private final PendingConnectionRegistry registry;
 
-   */
-  /*
-  @Bean
-  public WebSocketHandler webSocketHandler() {
-    return new WebSocketHandler();
-  }
-   */
+    public WebSocketConfig(ScoreService scoreService, PendingConnectionRegistry registry) {
+        this.scoreService = scoreService;
+        this.registry = registry;
+    }
+
+    @Bean
+    public RojoHandler rojoHandler() {
+        return new RojoHandler(scoreService, registry);
+    }
+
+    @Bean
+    public AzulHandler azulHandler() {
+        return new AzulHandler(scoreService, registry);
+    }
+
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry r) {
+        r.addHandler(rojoHandler(), "/ws/peto/rojo").setAllowedOrigins("*");
+        r.addHandler(azulHandler(), "/ws/peto/azul").setAllowedOrigins("*");
+    }
 }

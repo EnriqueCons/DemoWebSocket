@@ -8,4 +8,6 @@ public interface CombateService {
     Combate read(Integer id);
     Combate save(Combate combate);
     void delete(Integer id);
+
+    Long createNewCombatForRed();
 }
