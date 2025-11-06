@@ -41,6 +41,21 @@ public class RojoHandler extends TextWebSocketHandler {
             session.sendMessage(new TextMessage("ERR:NO_COMBATE_ASSOCIATED"));
             return;
         }
+
+        String payload = message.getPayload().trim();
+        System.out.println("[ROJO] Recibio combate " + combateId + ":" + payload);
+
+        try{
+            double impactValue = Double.parseDouble(payload);
+            scoreService.processImpact(combateId, "ROJO", impactValue);
+            session.sendMessage(new TextMessage("ACK" + payload));
+        } catch (NumberFormatException e) {
+            System.err.println("[ROJO] Error: Mensaje no numérico recibido: " + payload);
+            session.sendMessage(new TextMessage("ERR:INVALID_NUMBER"));
+        } catch (Exception e) {
+            System.err.println("[ROJO] Error al procesar el impacto: " + e.getMessage());
+            session.sendMessage(new TextMessage("ERR:PROCESSING_FAILED"));
+        }
     }
 
     @Override

@@ -46,11 +46,15 @@ public class AzulHandler extends TextWebSocketHandler {
         System.out.println("[AZUL] Mensaje recibido para combate " + combateId + ": '" + payload + "'");
 
         try {
-            int impact = Integer.parseInt(payload);
-            scoreService.processImpact(combateId, "AZUL", impact);
+            double impactValue = Double.parseDouble(payload);
+            scoreService.processImpact(combateId, "AZUL", impactValue);
             session.sendMessage(new TextMessage("ACK:" + payload));
         } catch (NumberFormatException e) {
-            session.sendMessage(new TextMessage("ERR"));
+            System.err.println("[AZUL] Error: Mensaje no numérico recibido: " + payload);
+            session.sendMessage(new TextMessage("ERR:INVALID_NUMBER"));
+        } catch (Exception e) {
+            System.err.println("[AZUL] Error al procesar el impacto: " + e.getMessage());
+            session.sendMessage(new TextMessage("ERR:PROCESSING_FAILED"));
         }
     }
 

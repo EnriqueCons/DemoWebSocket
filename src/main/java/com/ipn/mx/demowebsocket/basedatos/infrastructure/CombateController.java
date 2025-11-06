@@ -27,7 +27,6 @@ public class CombateController {
         this.pendingConnectionRegistry = pendingConnectionRegistry;
     }
 
-    // --- TUS ENDPOINTS CRUD (se quedan casi igual) ---
     @GetMapping("/combate")
     public List<Combate> readAll() { return combateService.readAll(); }
 
@@ -38,7 +37,6 @@ public class CombateController {
     @ResponseStatus(HttpStatus.CREATED)
     public Combate save(@RequestBody Combate combate) { return combateService.save(combate); }
 
-    // ... los métodos de update y delete se quedan igual ...
     @DeleteMapping("/combate/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Integer id) { combateService.delete(id); }
@@ -47,7 +45,6 @@ public class CombateController {
     @ResponseStatus(HttpStatus.CREATED)
     public Combate update(@PathVariable Integer id, @RequestBody Combate combate) {
         Combate c = combateService.read(id);
-        // ... lógica de actualización ...
         return combateService.save(c);
     }
 

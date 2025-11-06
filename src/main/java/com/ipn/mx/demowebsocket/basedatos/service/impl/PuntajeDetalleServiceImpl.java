@@ -3,6 +3,8 @@ package com.ipn.mx.demowebsocket.basedatos.service.impl;
 import com.ipn.mx.demowebsocket.basedatos.domain.entity.PuntajeDetalle;
 import com.ipn.mx.demowebsocket.basedatos.domain.repository.PuntajeDetalleRepository;
 import com.ipn.mx.demowebsocket.basedatos.service.PuntajeDetalleService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +15,10 @@ import java.util.List;
 public class PuntajeDetalleServiceImpl implements PuntajeDetalleService {
     @Autowired
     private PuntajeDetalleRepository puntajeDetalleRepository;
+
+    @PersistenceContext
+    private EntityManager em;
+
 
     @Override
     @Transactional(readOnly = true)
@@ -36,5 +42,15 @@ public class PuntajeDetalleServiceImpl implements PuntajeDetalleService {
     @Transactional
     public void delete(Long id) {
         puntajeDetalleRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long countByAlumnoId(Long alumnoId) {
+        Long count = em.createQuery(
+                "select count(p) from PuntajeDetalle p where p.alumno.id = :alumnoId",
+                Long.class
+        ).setParameter("alumnoId", alumnoId).getSingleResult();
+        return count !=  null ? count : 0L;
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = {"*"})
 @RestController
@@ -39,4 +40,11 @@ public class PuntajeDetalleController {
     @DeleteMapping("/puntaje/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) { service.delete(id); }
+
+    @GetMapping("/puntaje/alumno/{alumnoId}/count")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Object> countByAlumnoId(@PathVariable Long alumnoId) {
+        Long count = service.countByAlumnoId(alumnoId);
+        return Map.of("alumnoId",alumnoId, "count", count );
+    }
 }

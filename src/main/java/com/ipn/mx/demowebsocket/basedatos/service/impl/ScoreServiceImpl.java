@@ -76,7 +76,6 @@ public class ScoreServiceImpl implements ScoreService {
             pd.setCombate(combateActual);
             pd.setAlumno(alumnoPuntuador);
             pd.setValorPuntaje(puntosAGuardar);
-            // Si tu entidad tiene más campos (impacto, ladoGolpeado, timestamp), setéalos aquí
 
             puntajeRepo.save(pd);
             System.out.println("[Score] INSERT hecho para combate " + combateId + " (lado golpeado: " + ladoGolpeado + ", anota: " + ladoQueAnota + ")");
@@ -105,9 +104,7 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     private int calcularPuntos(double impact) {
-        // Tu regla actual
-        if (impact > 5.0 && impact < 10.0) return 1;
-        if (impact >= 10.0) return 2;
+        if (impact >= 14.0) return 1;
         return 0;
     }
 }
