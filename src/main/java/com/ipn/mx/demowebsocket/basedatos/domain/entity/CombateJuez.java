@@ -4,27 +4,32 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.io.Serializable;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "CombateJuez")
+@Table(
+        name = "CombateJuez",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_combatejuez_combate_juez", columnNames = {"idCombate","idJuez"}),
+                @UniqueConstraint(name = "uk_combatejuez_combate_rol",  columnNames = {"idCombate","rol"})
+        }
+)
 public class CombateJuez implements Serializable {
 
     @EmbeddedId
-    private CombateJuezId id;
+    private CombateJuezId id; // (idCombate, idJuez)
 
-    @ManyToOne(fetch = FetchType.LAZY) @MapsId("idCombate")
-    @JoinColumn(name = "idCombate",
-            foreignKey = @ForeignKey(name = "fk_cj_combate"))
+    @MapsId("idCombate")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idCombate", nullable = false)
     private Combate combate;
 
-    @ManyToOne(fetch = FetchType.LAZY) @MapsId("idJuez")
-    @JoinColumn(name = "idJuez",
-            foreignKey = @ForeignKey(name = "fk_cj_juez"))
+    @MapsId("idJuez")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idJuez", nullable = false)
     private Juez juez;
 
-    @Column(name = "rolJuez", length = 50)
-    private String rolJuez;
+    @Column(name = "rol", length = 20, nullable = false) // CENTRAL, J1, J2, J3
+    private String rol;
 }

@@ -18,20 +18,19 @@ import java.io.Serializable;
 public class Participacion implements Serializable {
 
     @EmbeddedId
-    private ParticipacionId id;
+    private ParticipacionId id = new ParticipacionId();// (idCombate, idAlumno)
 
+    @MapsId("idCombate") // vincula la parte de la PK al FK
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("idCombate")
-    @JoinColumn(name = "idCombate", foreignKey = @ForeignKey(name = "fk_part_combate"))
-    @JsonBackReference("combate-participaciones") // <-- Nómbrala así
+    @JoinColumn(name = "idCombate", nullable = false)
     private Combate combate;
 
+    @MapsId("idAlumno")  // vincula la parte de la PK al FK
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("idAlumno")
-    @JoinColumn(name = "idAlumno", foreignKey = @ForeignKey(name = "fk_part_alumno"))
-    @JsonBackReference("alumno-participaciones") // <-- Y esta con otro nombre
+    @JoinColumn(name = "idAlumno", nullable = false)
     private Alumno alumno;
 
-    @Column(name = "color", length = 10, nullable = false)
+    @Column(name = "color", length = 10)
     private String color;
+
 }

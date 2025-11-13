@@ -69,7 +69,7 @@ public class ScoreServiceImpl implements ScoreService {
             Combate combateActual = combateRepo.findById(Math.toIntExact(combateId))
                     .orElseThrow(() -> new RuntimeException("Error Crítico: Combate no encontrado con ID: " + combateId));
 
-            Alumno alumnoPuntuador = alumnoRepo.findById(Math.toIntExact(alumnoQueRecibePuntoId))
+            Alumno alumnoPuntuador = alumnoRepo.findById(alumnoQueRecibePuntoId)
                     .orElseThrow(() -> new RuntimeException("Error Crítico: Alumno no encontrado con ID: " + alumnoQueRecibePuntoId));
 
             PuntajeDetalle pd = new PuntajeDetalle();
@@ -104,7 +104,7 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     private int calcularPuntos(double impact) {
-        if (impact >= 14.0) return 1;
+        if (impact >= 10.0) return 1;
         return 0;
     }
 }

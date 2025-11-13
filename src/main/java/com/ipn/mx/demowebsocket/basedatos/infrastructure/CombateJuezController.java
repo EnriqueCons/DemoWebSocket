@@ -34,9 +34,11 @@ public class CombateJuezController {
     public CombateJuez update(@PathVariable Integer idCombate, @PathVariable Integer idJuez,
                               @RequestBody CombateJuez cj) {
         CombateJuez actual = service.read(new CombateJuezId(idCombate, idJuez));
-        actual.setRolJuez(cj.getRolJuez());
-        actual.setCombate(cj.getCombate());
-        actual.setJuez(cj.getJuez());
+        if (actual == null) {
+            throw new IllegalArgumentException("No existe CombateJuez con idCombate=" + idCombate + " e idJuez=" + idJuez);
+        }
+
+        actual.setRol(cj.getRol());
         return service.save(actual);
     }
 

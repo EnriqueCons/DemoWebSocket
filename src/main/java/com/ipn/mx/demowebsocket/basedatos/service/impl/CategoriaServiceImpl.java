@@ -23,7 +23,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Override
     @Transactional(readOnly = true)
     public Categoria read(Integer id) {
-        return categoriaRepository.findById(id).orElse(null);
+        return categoriaRepository.findById(Long.valueOf(id.toString())).orElse(null);
     }
 
     @Override
@@ -35,6 +35,6 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Override
     @Transactional
     public void delete(Integer id) {
-        categoriaRepository.deleteById(id);
+        categoriaRepository.deleteById(Long.valueOf(id.toString()));
     }
 }

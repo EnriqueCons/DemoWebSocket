@@ -4,8 +4,11 @@ import com.ipn.mx.demowebsocket.basedatos.domain.entity.Torneo;
 import com.ipn.mx.demowebsocket.basedatos.service.TorneoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
+import org.springframework.http.MediaType;
 
 @CrossOrigin(origins = {"*"})
 @RestController
@@ -14,19 +17,31 @@ public class TorneoController {
     @Autowired
     private TorneoService service;
 
-    @GetMapping("/torneo")
+    @GetMapping(value="/torneo", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<Torneo> readAll() { return service.readAll(); }
 
-    @GetMapping("/torneo/{id}")
+    @GetMapping(value="/torneo/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Torneo read(@PathVariable Integer id) { return service.read(id); }
 
-    @PostMapping("/torneo")
+    @PostMapping(
+            value = "/torneo",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(HttpStatus.CREATED)
-    public Torneo save(@RequestBody Torneo t) { return service.save(t); }
+    public Torneo save(@RequestBody Torneo t) {
+        // Si solo te llega admin.id, JPA lo resolverá cuando persistas.
+        // Si no llega 'administrador', puedes setearlo aquí si quieres.
+        return service.save(t);
+    }
 
-    @PutMapping("/torneo/{id}")
+    @PutMapping(
+            value = "/torneo/{id}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(HttpStatus.CREATED)
     public Torneo update(@PathVariable Integer id, @RequestBody Torneo t) {
         Torneo x = service.read(id);
@@ -40,4 +55,6 @@ public class TorneoController {
     @DeleteMapping("/torneo/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Integer id) { service.delete(id); }
+
+
 }

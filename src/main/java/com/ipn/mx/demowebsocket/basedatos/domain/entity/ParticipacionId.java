@@ -6,6 +6,8 @@ import java.io.Serializable;
 
 @Embeddable
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ParticipacionId implements Serializable {
@@ -13,5 +15,5 @@ public class ParticipacionId implements Serializable {
     private Integer idCombate;
 
     @Column(name = "idAlumno", nullable = false)
-    private Integer idAlumno;
+    private Long idAlumno;
 }

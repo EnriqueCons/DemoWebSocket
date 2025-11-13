@@ -59,4 +59,9 @@ public class AdminAuthController {
         return ResponseEntity.ok(resp);
 
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        return ResponseEntity.ok(Map.of("message", "sesión cerrada"));
+    }
 }

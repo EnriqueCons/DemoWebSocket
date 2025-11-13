@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface AlumnoService {
     List<Alumno> readAll();
-    Alumno read(Integer id);
+    Alumno read(Long id);
     Alumno save(Alumno alumno);
-    void delete(Integer id);
+    void delete(Long id);
 }

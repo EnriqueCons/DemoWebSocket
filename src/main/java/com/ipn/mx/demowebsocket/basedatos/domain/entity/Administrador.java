@@ -1,6 +1,7 @@
 package com.ipn.mx.demowebsocket.basedatos.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.*;
 @AllArgsConstructor
 @Builder
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(
         name = "Administrador",
         uniqueConstraints = {

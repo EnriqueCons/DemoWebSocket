@@ -40,6 +40,12 @@ public class Combate implements Serializable {
     @Column(name = "estado", length = 50)
     private String estado;
 
+    @PrePersist
+    public void prePersist() {
+        if (estado == null) estado = "EN_CURSO";
+        if (numeroRound == null) numeroRound = 3;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idAreaCombate",
             foreignKey = @ForeignKey(name = "fk_combate_area"))
