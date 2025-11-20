@@ -9,6 +9,7 @@ import com.ipn.mx.demowebsocket.basedatos.domain.repository.ParticipacionReposit
 import com.ipn.mx.demowebsocket.basedatos.domain.entity.PuntajeDetalle;
 import com.ipn.mx.demowebsocket.basedatos.domain.repository.PuntajeDetalleRepository;
 import com.ipn.mx.demowebsocket.basedatos.service.ScoreService;
+import com.ipn.mx.demowebsocket.servidor.TableroHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,17 +28,20 @@ public class ScoreServiceImpl implements ScoreService {
     private final CombateRepository combateRepo;
     private final AlumnoRepository alumnoRepo;
     private final ParticipacionRepository participacionRepo;
+    private final TableroHandler tableroHandler;
 
     private final Map<Long, ReentrantLock> locks = new ConcurrentHashMap<>();
 
     public ScoreServiceImpl(PuntajeDetalleRepository puntajeRepo,
                             CombateRepository combateRepo,
                             AlumnoRepository alumnoRepo,
-                            ParticipacionRepository participacionRepo) {
+                            ParticipacionRepository participacionRepo,
+                            TableroHandler tableroHandler) {
         this.puntajeRepo = puntajeRepo;
         this.combateRepo = combateRepo;
         this.alumnoRepo = alumnoRepo;
         this.participacionRepo = participacionRepo;
+        this.tableroHandler = tableroHandler;
     }
 
     @Transactional
@@ -58,11 +62,11 @@ public class ScoreServiceImpl implements ScoreService {
         Long alumnoQueRecibePuntoId = participacionQueAnota.getAlumno().getIdAlumno();
         if (alumnoQueRecibePuntoId == null) return;
 
-        // 4) Calcula puntos
+        // Calcula puntos
         int puntosAGuardar = calcularPuntos(impact);
         if (puntosAGuardar == 0) return;
 
-        // 5) Lock por combate
+        // Lock por combate
         ReentrantLock lock = locks.computeIfAbsent(combateId, k -> new ReentrantLock());
         lock.lock();
         try {
@@ -78,9 +82,22 @@ public class ScoreServiceImpl implements ScoreService {
             pd.setValorPuntaje(puntosAGuardar);
 
             puntajeRepo.save(pd);
-            System.out.println("[Score] INSERT hecho para combate " + combateId + " (lado golpeado: " + ladoGolpeado + ", anota: " + ladoQueAnota + ")");
+            System.out.println("[Score] ✓ INSERT hecho para combate " + combateId +
+                    " (lado golpeado: " + ladoGolpeado +
+                    ", anota: " + ladoQueAnota +
+                    ", puntos: " + puntosAGuardar + ")");
+
+            Long nuevoCount = puntajeRepo.countByAlumnoIdAlumno(alumnoQueRecibePuntoId);
+            System.out.println("[Score] 📊 Nuevo count para alumno " + alumnoQueRecibePuntoId + ": " + nuevoCount);
+
+            tableroHandler.notificarCambioPuntaje(
+                    Math.toIntExact(combateId),
+                    alumnoQueRecibePuntoId,
+                    nuevoCount
+            );
+
         } catch (Exception e) {
-            System.out.println("[Score] EXCEPTION al guardar: " + e.getMessage());
+            System.out.println("[Score] ✗ EXCEPTION al guardar: " + e.getMessage());
             e.printStackTrace();
             throw e;
         } finally {

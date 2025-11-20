@@ -55,9 +55,6 @@ public class CombateController {
         this.pendingConnectionRegistry = pendingConnectionRegistry;
     }
 
-
-
-
     @PostMapping("/combate")
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
@@ -92,7 +89,7 @@ public class CombateController {
         // 3) Crear Combate
         Combate c = new Combate();
         c.setAreaCombate(area);
-        c.setNumeroRound(intOrNull(body.get("numeroRound"))); // o “numeroRounds”
+        c.setNumeroRound(intOrNull(body.get("numeroRound"))); // o "numeroRounds"
         c.setDuracionRound(toLocalTime(body.get("duracionRound")));       // "HH:mm:ss"
         c.setDuracionDescanso(toLocalTime(body.get("duracionDescanso"))); // "HH:mm:ss"
         c.setHoraCombate(toLocalDateTime(body.get("horaCombate")));       // "YYYY-MM-DDTHH:mm:ss"
@@ -110,7 +107,6 @@ public class CombateController {
         pRojo.setColor("ROJO");
         participacionRepo.save(pRojo);
 
-
         Participacion pAzul = new Participacion();
         pAzul.setId(new ParticipacionId(
                 c.getIdCombate(),
@@ -126,22 +122,28 @@ public class CombateController {
         if (jueces != null) {
             // Central
             crearYAsociarJuez(c, jueces.get("arbitroCentral"), "CENTRAL");
-
             // J1
             crearYAsociarJuez(c, jueces.get("juez1"), "J1");
-
             // J2
             crearYAsociarJuez(c, jueces.get("juez2"), "J2");
-
             // J3
             crearYAsociarJuez(c, jueces.get("juez3"), "J3");
         }
-
         Map<String,Object> resp = new HashMap<>();
         resp.put("id", c.getIdCombate());
         resp.put("idCombate", c.getIdCombate());
-        return resp;
 
+        resp.put("idAlumnoRojo", aRojo.getIdAlumno());
+        resp.put("idAlumnoAzul", aAzul.getIdAlumno());
+
+        resp.put("duracionRound", body.get("duracionRound"));
+        resp.put("duracionDescanso", body.get("duracionDescanso"));
+        resp.put("numeroRounds", body.get("numeroRound"));
+
+        resp.put("area", area.getNombreArea());
+        resp.put("estado", c.getEstado());
+
+        return resp;
     }
 
     @PostMapping("/combate/{id}/prepare")

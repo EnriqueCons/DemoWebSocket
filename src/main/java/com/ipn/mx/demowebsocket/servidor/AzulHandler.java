@@ -1,6 +1,7 @@
 package com.ipn.mx.demowebsocket.servidor;
 
 import com.ipn.mx.demowebsocket.basedatos.service.ScoreService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -8,6 +9,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CompletableFuture;
 
 public class AzulHandler extends TextWebSocketHandler {
 
@@ -27,6 +29,8 @@ public class AzulHandler extends TextWebSocketHandler {
         if (combateId != null) {
             sessions.put(session, combateId);
             System.out.println("[AZUL] Conexión establecida y asociada al combate " + combateId);
+            // Enviar ACK inmediato
+            session.sendMessage(new TextMessage("CONNECTED:" + combateId));
         } else {
             System.out.println("[AZUL] ADVERTENCIA: Se recibió una conexión sin un combate preparado. Rechazando.");
             session.sendMessage(new TextMessage("ERR:NO_COMBATE_PREPARED"));
@@ -43,18 +47,26 @@ public class AzulHandler extends TextWebSocketHandler {
         }
 
         String payload = message.getPayload().trim();
-        System.out.println("[AZUL] Mensaje recibido para combate " + combateId + ": '" + payload + "'");
 
         try {
             double impactValue = Double.parseDouble(payload);
-            scoreService.processImpact(combateId, "AZUL", impactValue);
+
+            // Enviar ACK inmediatamente ANTES de procesar
             session.sendMessage(new TextMessage("ACK:" + payload));
+
+            // Procesar de forma asíncrona para no bloquear
+            CompletableFuture.runAsync(() -> {
+                try {
+                    scoreService.processImpact(combateId, "AZUL", impactValue);
+                    System.out.println("[AZUL] Procesado combate " + combateId + ": " + impactValue);
+                } catch (Exception e) {
+                    System.err.println("[AZUL] Error al procesar el impacto: " + e.getMessage());
+                }
+            });
+
         } catch (NumberFormatException e) {
             System.err.println("[AZUL] Error: Mensaje no numérico recibido: " + payload);
             session.sendMessage(new TextMessage("ERR:INVALID_NUMBER"));
-        } catch (Exception e) {
-            System.err.println("[AZUL] Error al procesar el impacto: " + e.getMessage());
-            session.sendMessage(new TextMessage("ERR:PROCESSING_FAILED"));
         }
     }
 
