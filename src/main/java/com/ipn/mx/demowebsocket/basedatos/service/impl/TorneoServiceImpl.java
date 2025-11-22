@@ -37,4 +37,11 @@ public class TorneoServiceImpl implements TorneoService {
     public void delete(Integer id) {
         torneoRepository.deleteById(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Torneo findMostRecent() {
+        return torneoRepository.findMostRecentTorneo()
+                .orElse(null);
+    }
 }

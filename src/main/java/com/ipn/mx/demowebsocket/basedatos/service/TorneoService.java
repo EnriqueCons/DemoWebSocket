@@ -8,4 +8,7 @@ public interface TorneoService {
     Torneo read(Integer id);
     Torneo save(Torneo torneo);
     void delete(Integer id);
+
+    Torneo findMostRecent();
+
 }

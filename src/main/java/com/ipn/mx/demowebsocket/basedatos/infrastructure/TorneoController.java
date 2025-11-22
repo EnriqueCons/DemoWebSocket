@@ -5,8 +5,12 @@ import com.ipn.mx.demowebsocket.basedatos.service.TorneoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.MediaType;
 
@@ -55,6 +59,24 @@ public class TorneoController {
     @DeleteMapping("/torneo/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Integer id) { service.delete(id); }
+
+    @GetMapping("/torneo/ultimo")
+    public ResponseEntity<Map<String, Object>> getUltimoTorneo() {
+        // Asume que tienes un método en el service
+        Torneo ultimo = service.findMostRecent();
+
+        if (ultimo == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("idTorneo", ultimo.getIdTorneo());
+        response.put("nombre", ultimo.getNombre());
+        response.put("fechaHora", ultimo.getFechaHora());
+        response.put("sede", ultimo.getSede());
+
+        return ResponseEntity.ok(response);
+    }
 
 
 }

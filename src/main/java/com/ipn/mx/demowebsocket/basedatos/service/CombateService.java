@@ -10,4 +10,10 @@ public interface CombateService {
     void delete(Integer id);
 
     Long createNewCombatForRed();
+
+    List<Combate> findByAreaNombre(String nombreArea);
+    List<Combate> findByEstado(String estado);
+
+    List<Combate> findByTorneoId(Integer idTorneo);
+
 }

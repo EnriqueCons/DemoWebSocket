@@ -40,9 +40,22 @@ public class CombateServiceImpl implements CombateService {
 
     @Override
     public Long createNewCombatForRed() {
-        // Aquí persistes Combate en BD con estado EN_CURSO, lado rojo “pendiente”, etc.
-        // return combateRepository.save(...).getId();
-        // Ejemplo stub:
-        return System.currentTimeMillis(); // <— reemplaza por ID real de BD
+        return System.currentTimeMillis();
     }
+
+    @Override
+    public List<Combate> findByAreaNombre(String nombreArea) {
+        return combateRepository.findByAreaCombate_NombreArea(nombreArea);
+    }
+
+    @Override
+    public List<Combate> findByEstado(String estado) {
+        return combateRepository.findByEstado(estado);
+    }
+
+    @Override
+    public List<Combate> findByTorneoId(Integer idTorneo) {
+        return combateRepository.findByAreaCombate_Torneo_IdTorneo(idTorneo);
+    }
+
 }

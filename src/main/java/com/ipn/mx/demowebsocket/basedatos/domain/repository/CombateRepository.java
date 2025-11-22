@@ -15,4 +15,9 @@ public interface CombateRepository extends JpaRepository<Combate, Integer> {
     // equivalente con "Top"
     Optional<Combate> findTopByAreaCombate_IdAreaCombateAndEstadoOrderByHoraCombateDesc(
             Integer idAreaCombate, String estado);
+
+    List<Combate> findByAreaCombate_NombreArea(String nombreArea);
+    List<Combate> findByEstado(String estado);
+
+    List<Combate> findByAreaCombate_Torneo_IdTorneo(Integer idTorneo);
 }

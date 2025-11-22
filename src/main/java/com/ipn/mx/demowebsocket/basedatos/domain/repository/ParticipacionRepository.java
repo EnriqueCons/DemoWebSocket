@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ParticipacionRepository extends JpaRepository<Participacion, ParticipacionId> {
@@ -19,4 +20,6 @@ public interface ParticipacionRepository extends JpaRepository<Participacion, Pa
     """)
     Optional<Participacion> findByCombateIdAndColor(@Param("combateId") Long combateId,
                                                     @Param("colorUpper") String colorUpper);
+
+    List<Participacion> findByCombate_IdCombate(Integer idCombate);
 }
