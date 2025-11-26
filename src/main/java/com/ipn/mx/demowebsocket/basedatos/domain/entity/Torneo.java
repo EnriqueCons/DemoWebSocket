@@ -11,7 +11,8 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity @Table(name = "Torneo")
+@Entity
+@Table(name = "Torneo")
 @JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class Torneo implements Serializable {
 
@@ -33,14 +34,19 @@ public class Torneo implements Serializable {
     @Column(name = "estado", length = 50)
     private String estado;
 
-    // Recibirás el Administrador como OBJETO { "idAdministrador": 1 }
+    // Relación con Administrador (NO se elimina en cascada)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idAdministrador",
             foreignKey = @ForeignKey(name = "fk_torneo_admin"))
     private Administrador administrador;
 
-    // No necesitas mandar ni recibir "areas" al crear. Evítalo en JSON.
-    @OneToMany(mappedBy = "torneo", fetch = FetchType.LAZY)
-    @JsonIgnore
+    // Relación con Areas - SE ELIMINAN en cascada
+    @OneToMany(
+            mappedBy = "torneo",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference("torneo-areas")
     private List<AreaCombate> areas = new ArrayList<>();
 }

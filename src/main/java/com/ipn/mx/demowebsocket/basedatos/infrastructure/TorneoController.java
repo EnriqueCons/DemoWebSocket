@@ -7,27 +7,36 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.MediaType;
-
 @CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/apiTorneos")
 public class TorneoController {
+
     @Autowired
     private TorneoService service;
 
     @GetMapping(value="/torneo", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<Torneo> readAll() { return service.readAll(); }
+    public List<Torneo> readAll() {
+        return service.readAll();
+    }
 
     @GetMapping(value="/torneo/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Torneo read(@PathVariable Integer id) { return service.read(id); }
+    public Torneo read(@PathVariable Integer id) {
+        Torneo torneo = service.read(id);
+        if (torneo == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Torneo no encontrado con id: " + id);
+        }
+        return torneo;
+    }
 
     @PostMapping(
             value = "/torneo",
@@ -36,33 +45,47 @@ public class TorneoController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     public Torneo save(@RequestBody Torneo t) {
-        // Si solo te llega admin.id, JPA lo resolverá cuando persistas.
-        // Si no llega 'administrador', puedes setearlo aquí si quieres.
         return service.save(t);
     }
 
+    // ⭐ ACTUALIZADO: Ahora incluye setNombre()
     @PutMapping(
             value = "/torneo/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public Torneo update(@PathVariable Integer id, @RequestBody Torneo t) {
         Torneo x = service.read(id);
+
+        if (x == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Torneo no encontrado con id: " + id);
+        }
+
+        x.setNombre(t.getNombre());
         x.setFechaHora(t.getFechaHora());
         x.setSede(t.getSede());
         x.setEstado(t.getEstado());
         x.setAdministrador(t.getAdministrador());
+
         return service.save(x);
     }
 
+    // ⭐ DELETE con cascada automática
     @DeleteMapping("/torneo/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Integer id) { service.delete(id); }
+    public void delete(@PathVariable Integer id) {
+        Torneo torneo = service.read(id);
+        if (torneo == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Torneo no encontrado con id: " + id);
+        }
+        service.delete(id);
+    }
 
     @GetMapping("/torneo/ultimo")
     public ResponseEntity<Map<String, Object>> getUltimoTorneo() {
-        // Asume que tienes un método en el service
         Torneo ultimo = service.findMostRecent();
 
         if (ultimo == null) {
@@ -77,6 +100,4 @@ public class TorneoController {
 
         return ResponseEntity.ok(response);
     }
-
-
 }

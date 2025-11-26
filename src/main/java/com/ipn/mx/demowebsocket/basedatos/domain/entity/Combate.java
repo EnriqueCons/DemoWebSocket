@@ -1,5 +1,6 @@
 package com.ipn.mx.demowebsocket.basedatos.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +22,6 @@ public class Combate implements Serializable {
     @Column(name = "idCombate", nullable = false)
     private Integer idCombate;
 
-    // ... (otros campos se quedan igual)
     @Column(name = "numeroRound")
     private Integer numeroRound;
 
@@ -46,21 +46,40 @@ public class Combate implements Serializable {
         if (numeroRound == null) numeroRound = 3;
     }
 
+    // Relación con AreaCombate (padre)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idAreaCombate",
             foreignKey = @ForeignKey(name = "fk_combate_area"))
+    @JsonBackReference("area-combates")
     private AreaCombate areaCombate;
 
-    // --- CORRECCIONES ---
-    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    // Relación con Puntajes - SE ELIMINAN en cascada
+    @OneToMany(
+            mappedBy = "combate",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @JsonManagedReference("combate-puntajes")
     private List<PuntajeDetalle> puntajes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // Relación con Participaciones - SE ELIMINAN en cascada
+    @OneToMany(
+            mappedBy = "combate",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @JsonManagedReference("combate-participaciones")
     private List<Participacion> participaciones = new ArrayList<>();
 
-    @OneToMany(mappedBy = "combate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // Relación con Jueces - SE ELIMINAN en cascada
+    @OneToMany(
+            mappedBy = "combate",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @JsonManagedReference("combate-jueces")
     private List<CombateJuez> combateJueces = new ArrayList<>();
 }
