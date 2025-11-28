@@ -11,4 +11,7 @@ public interface PuntajeDetalleService {
 
     Long countByAlumnoId(Long alumnoId);
 
+    boolean deleteLastByAlumnoId(Long alumnoId);
+
+
 }

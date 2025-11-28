@@ -90,6 +90,8 @@ public class CombateController {
         aRojo.setSexo(str(rojo.get("sexo")));
         aRojo.setPeso(toBigDecimal(rojo.get("pesoKg")));
         aRojo.setFechaNacimiento(toLocalDate(rojo.get("fechaNacimiento")));
+        aRojo.setAltura(toBigDecimal(rojo.get("alturaCm")));
+        aRojo.setNacionalidad(str(rojo.get("nacionalidad")));
         aRojo = alumnoService.save(aRojo);
 
         Alumno aAzul = new Alumno();
@@ -99,6 +101,8 @@ public class CombateController {
         aAzul.setSexo(str(azul.get("sexo")));
         aAzul.setPeso(toBigDecimal(azul.get("pesoKg")));
         aAzul.setFechaNacimiento(toLocalDate(azul.get("fechaNacimiento")));
+        aAzul.setAltura(toBigDecimal(azul.get("alturaCm")));
+        aAzul.setNacionalidad(str(azul.get("nacionalidad")));
         aAzul = alumnoService.save(aAzul);
 
         // 3) Crear Combate

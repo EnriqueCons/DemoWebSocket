@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PuntajeDetalleServiceImpl implements PuntajeDetalleService {
@@ -52,5 +53,20 @@ public class PuntajeDetalleServiceImpl implements PuntajeDetalleService {
                 Long.class
         ).setParameter("alumnoId", alumnoId).getSingleResult();
         return count !=  null ? count : 0L;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteLastByAlumnoId(Long alumnoId) {
+        Optional<PuntajeDetalle> last = puntajeDetalleRepository.findTopByAlumnoIdAlumnoOrderByIdPuntajeDesc(alumnoId);
+
+        if (last.isPresent()) {
+            puntajeDetalleRepository.delete(last.get());
+            System.out.println(" Eliminado último puntaje del alumno " + alumnoId);
+            return true;
+        }
+
+        System.out.println(" No hay puntajes para eliminar del alumno " + alumnoId);
+        return false;
     }
 }

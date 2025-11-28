@@ -1,6 +1,6 @@
 package com.ipn.mx.demowebsocket.basedatos.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference; // Importante
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -22,13 +22,29 @@ public class Alumno {
     @Column(name = "idAlumno")
     private Long idAlumno;
 
-    // ... otros campos como nombre, peso, etc.
+    @Column(name = "nombreAlumno", length = 30, nullable = false)
     private String nombreAlumno;
+
+    @Column(name = "paternoAlumno", length = 30, nullable = false)
     private String paternoAlumno;
+
+    @Column(name = "maternoAlumno", length = 30, nullable = false)
     private String maternoAlumno;
+
+    @Column(name = "fechaNacimiento", nullable = false)
     private LocalDate fechaNacimiento;
+
+    @Column(name = "sexo", length = 20, nullable = false)
     private String sexo;
+
+    @Column(name = "peso", nullable = false)
     private BigDecimal peso;
+
+    @Column(name = "altura", nullable = false)
+    private BigDecimal altura;
+
+    @Column(name = "nacionalidad", length = 50, nullable = false)
+    private String nacionalidad;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idCategoria")

@@ -26,7 +26,6 @@ public class AlumnoController {
     @ResponseStatus(HttpStatus.OK)
     public Alumno read(@PathVariable Long id) { return service.read(id); }
 
-    // ⬇️ Recibe JSON directo (sin DTO) desde la pantalla
     @PostMapping("/alumno")
     @ResponseStatus(HttpStatus.CREATED)
     public Alumno save(@RequestBody Map<String, Object> body) {
@@ -36,6 +35,8 @@ public class AlumnoController {
         a.setMaternoAlumno(str(body.get("maternoAlumno")));
         a.setSexo(str(body.get("sexo")));
         a.setPeso(toBigDecimal(body.get("peso")));
+        a.setAltura(toBigDecimal(body.get("alura")));
+        a.setNacionalidad(str(body.get("nacionalidad")));
 
         // fechaNacimiento: espera "YYYY-MM-DD" (te lo mando así desde Kivy)
         a.setFechaNacimiento(toLocalDate(body.get("fechaNacimiento")));

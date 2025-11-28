@@ -63,7 +63,6 @@ public class Combate implements Serializable {
     @JsonManagedReference("combate-puntajes")
     private List<PuntajeDetalle> puntajes = new ArrayList<>();
 
-    // Relación con Participaciones - SE ELIMINAN en cascada
     @OneToMany(
             mappedBy = "combate",
             fetch = FetchType.LAZY,
@@ -73,7 +72,6 @@ public class Combate implements Serializable {
     @JsonManagedReference("combate-participaciones")
     private List<Participacion> participaciones = new ArrayList<>();
 
-    // Relación con Jueces - SE ELIMINAN en cascada
     @OneToMany(
             mappedBy = "combate",
             fetch = FetchType.LAZY,
