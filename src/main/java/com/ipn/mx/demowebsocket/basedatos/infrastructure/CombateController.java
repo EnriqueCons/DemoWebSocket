@@ -5,6 +5,8 @@ import com.ipn.mx.demowebsocket.basedatos.domain.repository.CombateJuezRepositor
 import com.ipn.mx.demowebsocket.basedatos.domain.repository.ParticipacionRepository;
 import com.ipn.mx.demowebsocket.basedatos.service.*;
 import com.ipn.mx.demowebsocket.servidor.PendingConnectionRegistry;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,8 @@ public class CombateController {
     @Autowired private CombateJuezRepository combateJuezRepo;
     private final PendingConnectionRegistry pendingConnectionRegistry;
     @Autowired private TorneoService torneoService;
+    @PersistenceContext
+    private EntityManager em;
 
     @Autowired
     public CombateController(
@@ -68,7 +72,7 @@ public class CombateController {
 
         Torneo torneo = null;
         if (idTorneo != null) {
-            torneo = torneoService.read(idTorneo); // Necesitas inyectar TorneoService
+            torneo = torneoService.read(idTorneo);
         } else {
             torneo = torneoService.findMostRecent();
         }
@@ -84,9 +88,9 @@ public class CombateController {
         Map<String,Object> azul = (Map<String,Object>) body.get("competidorAzul");
 
         Alumno aRojo = new Alumno();
-        aRojo.setNombreAlumno(str(rojo.get("nombres")));
-        aRojo.setPaternoAlumno(null);
-        aRojo.setMaternoAlumno(null);
+        aRojo.setNombreAlumno(str(rojo.get("nombreAlumno")));
+        aRojo.setPaternoAlumno(str(rojo.get("paternoAlumno")));
+        aRojo.setMaternoAlumno(str(rojo.get("maternoAlumno")));
         aRojo.setSexo(str(rojo.get("sexo")));
         aRojo.setPeso(toBigDecimal(rojo.get("pesoKg")));
         aRojo.setFechaNacimiento(toLocalDate(rojo.get("fechaNacimiento")));
@@ -95,9 +99,9 @@ public class CombateController {
         aRojo = alumnoService.save(aRojo);
 
         Alumno aAzul = new Alumno();
-        aAzul.setNombreAlumno(str(azul.get("nombres")));
-        aAzul.setPaternoAlumno(null);
-        aAzul.setMaternoAlumno(null);
+        aAzul.setNombreAlumno(str(azul.get("nombreAlumno")));
+        aAzul.setPaternoAlumno(str(azul.get("paternoAlumno")));
+        aAzul.setMaternoAlumno(str(azul.get("maternoAlumno")));
         aAzul.setSexo(str(azul.get("sexo")));
         aAzul.setPeso(toBigDecimal(azul.get("pesoKg")));
         aAzul.setFechaNacimiento(toLocalDate(azul.get("fechaNacimiento")));

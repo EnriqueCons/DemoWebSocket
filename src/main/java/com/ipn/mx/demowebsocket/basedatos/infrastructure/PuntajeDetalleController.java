@@ -4,6 +4,8 @@ import com.ipn.mx.demowebsocket.basedatos.domain.entity.Alumno;
 import com.ipn.mx.demowebsocket.basedatos.domain.entity.Combate;
 import com.ipn.mx.demowebsocket.basedatos.domain.entity.PuntajeDetalle;
 import com.ipn.mx.demowebsocket.basedatos.service.PuntajeDetalleService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,9 @@ import java.util.Map;
 public class PuntajeDetalleController {
     @Autowired
     private PuntajeDetalleService service;
+
+    @PersistenceContext
+    private EntityManager em;
 
     @GetMapping("/puntaje")
     @ResponseStatus(HttpStatus.OK)
@@ -63,7 +68,7 @@ public class PuntajeDetalleController {
         );
     }
 
-    // ⭐ NUEVO ENDPOINT SIMPLIFICADO: Agregar puntaje con solo IDs
+    // ⭐ CORREGIDO: Agregar puntaje con solo IDs usando getReference
     @PostMapping("/puntaje/simple")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> saveSimple(
@@ -71,23 +76,17 @@ public class PuntajeDetalleController {
             @RequestParam Long alumnoId,
             @RequestParam(defaultValue = "1") Integer valorPuntaje) {
 
-        // Crear el objeto PuntajeDetalle
         PuntajeDetalle pd = new PuntajeDetalle();
         pd.setValorPuntaje(valorPuntaje);
 
-        // Crear referencias solo con IDs (JPA las resolverá)
-        Combate combate = new Combate();
-        combate.setIdCombate(combateId.intValue()); // Ajusta según el tipo de tu ID
+        // ⭐ USAR getReference para obtener referencia sin cargar entidad
+        Combate combate = em.getReference(Combate.class, combateId.intValue());
         pd.setCombate(combate);
 
-        Alumno alumno = new Alumno();
-        alumno.setIdAlumno(alumnoId.longValue()); // Ajusta según el tipo de tu ID
+        Alumno alumno = em.getReference(Alumno.class, alumnoId.intValue());
         pd.setAlumno(alumno);
 
-        // Guardar
         PuntajeDetalle saved = service.save(pd);
-
-        // Obtener nuevo count
         Long newCount = service.countByAlumnoId(alumnoId);
 
         return Map.of(

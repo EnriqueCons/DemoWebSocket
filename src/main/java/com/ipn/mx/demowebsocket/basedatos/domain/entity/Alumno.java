@@ -22,13 +22,13 @@ public class Alumno {
     @Column(name = "idAlumno")
     private Long idAlumno;
 
-    @Column(name = "nombreAlumno", length = 30, nullable = false)
+    @Column(name = "nombreAlumno", length = 100, nullable = false)
     private String nombreAlumno;
 
-    @Column(name = "paternoAlumno", length = 30, nullable = false)
+    @Column(name = "paternoAlumno", length = 100, nullable = true)
     private String paternoAlumno;
 
-    @Column(name = "maternoAlumno", length = 30, nullable = false)
+    @Column(name = "maternoAlumno", length = 100, nullable = true)
     private String maternoAlumno;
 
     @Column(name = "fechaNacimiento", nullable = false)
