@@ -5,17 +5,15 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping; // <--- ¡AÑADE ESTA LÍNEA!
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth/juez") // <--- NUEVO ENDPOINT BASE para el login de jueces
-@CrossOrigin(origins = {"*"}) // Permite peticiones desde cualquier origen (para desarrollo)
+@RequestMapping("/api/auth/juez") // <--- NUEVO ENDPOINT BASE
+@CrossOrigin(origins = {"*"})
 public class JuezAuthController {
 
-    // Contraseña simple para el login de jueces.
-    // En un sistema real, esto se validaría contra una base de datos de usuarios/jueces.
     private final String PASSWORD_JUEZ_CORRECTA = "petotech"; // La contraseña que Kivy enviará
 
     @PostMapping("/login") // Este endpoint completo será /api/auth/juez/login

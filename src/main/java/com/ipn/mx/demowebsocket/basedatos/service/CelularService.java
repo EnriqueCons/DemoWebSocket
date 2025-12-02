@@ -2,12 +2,11 @@ package com.ipn.mx.demowebsocket.basedatos.service;
 
 public interface CelularService {
 
+    void guardarPuntaje(Integer juezId, Integer puntos, String color, Integer combateId);
 
-    void registrarPunto(Integer combateId, Integer juezId, String color, Integer puntos);
-
-
-    void registrarIncidencia(Integer combateId, Integer juezId);
-
+    void guardarIncidencia(Integer juezId, Integer combateId);
 
     void registrarAdvertencia(Integer combateId);
+
+    void guardarPromedio(String color, Integer promedioFinal, Integer combateId);
 }
