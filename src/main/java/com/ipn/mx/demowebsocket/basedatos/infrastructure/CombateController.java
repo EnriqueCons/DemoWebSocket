@@ -117,6 +117,7 @@ public class CombateController {
         c.setDuracionDescanso(toLocalTime(body.get("duracionDescanso"))); // "HH:mm:ss"
         c.setHoraCombate(toLocalDateTime(body.get("horaCombate")));       // "YYYY-MM-DDTHH:mm:ss"
         c.setEstado(strOrDefault(body.get("estado"), "EN_CURSO"));
+        c.setContrasenaCombate(str(body.get("contrasenaCombate")));
         c = combateService.save(c);
 
         // 4) Crear Participaciones (ROJO / AZUL) enlazando alumnos con combate
@@ -162,6 +163,7 @@ public class CombateController {
         resp.put("numeroRounds", body.get("numeroRound"));
         resp.put("area", area.getNombreArea());
         resp.put("estado", c.getEstado());
+        resp.put("contrasenaCombate", c.getContrasenaCombate());
 
         if (torneo != null) {
             resp.put("idTorneo", torneo.getIdTorneo());
@@ -283,6 +285,7 @@ public class CombateController {
         map.put("duracionDescanso", c.getDuracionDescanso());
         map.put("horaCombate", c.getHoraCombate());
         map.put("estado", c.getEstado());
+        map.put("contrasenaCombate", c.getContrasenaCombate());
 
         // Área - CORREGIDO: usar idAreaCombate
         if (c.getAreaCombate() != null) {

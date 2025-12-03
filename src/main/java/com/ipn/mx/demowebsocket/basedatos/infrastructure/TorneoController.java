@@ -48,7 +48,6 @@ public class TorneoController {
         return service.save(t);
     }
 
-    // ⭐ ACTUALIZADO: Ahora incluye setNombre()
     @PutMapping(
             value = "/torneo/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -72,7 +71,6 @@ public class TorneoController {
         return service.save(x);
     }
 
-    // ⭐ DELETE con cascada automática
     @DeleteMapping("/torneo/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Integer id) {

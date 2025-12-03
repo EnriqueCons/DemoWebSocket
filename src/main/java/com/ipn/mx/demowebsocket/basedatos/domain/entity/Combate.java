@@ -22,22 +22,22 @@ public class Combate implements Serializable {
     @Column(name = "idCombate", nullable = false)
     private Integer idCombate;
 
-    @Column(name = "numeroRound")
+    @Column(name = "numeroRound", nullable = false)
     private Integer numeroRound;
 
-    @Column(name = "duracionRound")
+    @Column(name = "duracionRound", nullable = false)
     private LocalTime duracionRound;
 
-    @Column(name = "duracionDescanso")
+    @Column(name = "duracionDescanso", nullable = false)
     private LocalTime duracionDescanso;
 
-    @Column(name = "horaCombate")
+    @Column(name = "horaCombate", nullable = false)
     private LocalDateTime horaCombate;
 
-    @Column(name = "contrasenaCombate", length = 255)
+    @Column(name = "contrasenaCombate", nullable = false, length = 255)
     private String contrasenaCombate;
 
-    @Column(name = "estado", length = 50)
+    @Column(name = "estado", length = 50, nullable = false)
     private String estado;
 
     @PrePersist
