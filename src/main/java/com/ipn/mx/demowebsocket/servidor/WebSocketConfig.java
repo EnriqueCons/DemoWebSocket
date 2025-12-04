@@ -28,9 +28,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
         this.celularHandler = celularHandler;
     }
 
-    // ============================
-    // ✅ HANDLERS AZUL Y ROJO
-    // ============================
 
     @Bean
     public RojoHandler rojoHandler() {
@@ -42,9 +39,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
         return new AzulHandler(scoreService, registry);
     }
 
-    // ============================
-    // ✅ CONFIGURACIÓN DEL SERVIDOR WS
-    // ============================
 
     @Bean
     public ServletServerContainerFactoryBean createWebSocketContainer() {
@@ -56,9 +50,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         return container;
     }
 
-    // ============================
-    // ✅ THREAD POOL
-    // ============================
+
 
     @Bean
     public ThreadPoolTaskExecutor webSocketTaskExecutor() {
@@ -71,9 +63,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
         return executor;
     }
 
-    // ============================
-    // ✅ REGISTRO DE RUTAS WS
-    // ============================
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry r) {

@@ -11,16 +11,12 @@ public class CelularServiceImpl implements CelularService {
     public void guardarPuntaje(Integer juezId, Integer puntos, String color, Integer combateId) {
 
         if (puntos < 0 || puntos > 5) {
-            System.out.println("Puntaje invalido: " + puntos + " (solo 0 a 5)");
+            System.out.println("Puntaje invalido");
             return;
         }
 
         System.out.println(
-                "Guardando puntaje en BD -> " +
-                        "Combate: " + combateId +
-                        " | Juez: " + juezId +
-                        " | Color: " + color +
-                        " | Puntos: " + puntos
+                "marco de puntos un juez" + puntos
         );
     }
 
@@ -28,9 +24,7 @@ public class CelularServiceImpl implements CelularService {
     public void guardarIncidencia(Integer juezId, Integer combateId) {
 
         System.out.println(
-                "Guardando incidencia -> " +
-                        "Combate: " + combateId +
-                        " | Juez: " + juezId
+                "Alguien marco incidencia"
         );
     }
 
@@ -38,8 +32,7 @@ public class CelularServiceImpl implements CelularService {
     public void registrarAdvertencia(Integer combateId) {
 
         System.out.println(
-                "Guardando advertencia general -> " +
-                        "Combate: " + combateId
+                "aqui se detiene el tiempo"
         );
     }
 
@@ -47,10 +40,7 @@ public class CelularServiceImpl implements CelularService {
     public void guardarPromedio(String color, Integer promedioFinal, Integer combateId) {
 
         System.out.println(
-                "Guardando promedio en BD -> " +
-                        "Combate: " + combateId +
-                        " | Color: " + color +
-                        " | Promedio: " + promedioFinal
+                "puntaje, aqui se guarda el puntaje" + promedioFinal
         );
     }
 }
