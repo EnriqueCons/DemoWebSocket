@@ -82,13 +82,13 @@ public class ScoreServiceImpl implements ScoreService {
             pd.setValorPuntaje(puntosAGuardar);
 
             puntajeRepo.save(pd);
-            System.out.println("[Score] ✓ INSERT hecho para combate " + combateId +
+            System.out.println("[Score]  INSERT hecho para combate " + combateId +
                     " (lado golpeado: " + ladoGolpeado +
                     ", anota: " + ladoQueAnota +
                     ", puntos: " + puntosAGuardar + ")");
 
             Long nuevoCount = puntajeRepo.countByAlumnoIdAlumno(alumnoQueRecibePuntoId);
-            System.out.println("[Score] 📊 Nuevo count para alumno " + alumnoQueRecibePuntoId + ": " + nuevoCount);
+            System.out.println("[Score] Nuevo count para alumno " + alumnoQueRecibePuntoId + ": " + nuevoCount);
 
             tableroHandler.notificarCambioPuntaje(
                     Math.toIntExact(combateId),

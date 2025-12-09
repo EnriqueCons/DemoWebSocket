@@ -20,4 +20,7 @@ public interface CombateRepository extends JpaRepository<Combate, Integer> {
     List<Combate> findByEstado(String estado);
 
     List<Combate> findByAreaCombate_Torneo_IdTorneo(Integer idTorneo);
+
+    Optional<Combate> findByContrasenaCombate(String contrasenaCombate);
+
 }

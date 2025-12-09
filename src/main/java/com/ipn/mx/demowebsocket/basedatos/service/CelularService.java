@@ -9,4 +9,6 @@ public interface CelularService {
     void registrarAdvertencia(Integer combateId);
 
     void guardarPromedio(String color, Integer promedioFinal, Integer combateId);
+
+    Integer validarPasswordCombate(String password);
 }
