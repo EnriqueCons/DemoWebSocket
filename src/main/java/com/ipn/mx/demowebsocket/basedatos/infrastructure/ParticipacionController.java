@@ -44,4 +44,11 @@ public class ParticipacionController {
     public void delete(@PathVariable Integer idCombate, @PathVariable Integer idAlumno) {
         service.delete(new ParticipacionId(idCombate,  idAlumno.longValue()));
     }
+
+    @GetMapping("/combate/{idCombate}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Participacion> getParticipacionesByCombate(@PathVariable Integer idCombate) {
+        return service.findByCombateId(idCombate);
+    }
+
 }

@@ -38,4 +38,10 @@ public class ParticipacionServiceImpl implements ParticipacionService {
     public void delete(ParticipacionId id) {
         participacionRepository.deleteById(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Participacion> findByCombateId(Integer idCombate) {
+        return participacionRepository.findByCombateIdCombate(idCombate);
+    }
 }

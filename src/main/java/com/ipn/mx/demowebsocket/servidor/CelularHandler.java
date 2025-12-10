@@ -210,9 +210,7 @@ public class CelularHandler extends TextWebSocketHandler {
             return;
         }
 
-        if (msg.startsWith("INCIDENCIA:")) {
-
-            String color = msg.replace("INCIDENCIA:", "").trim();
+        if (msg.equals("INCIDENCIA")) {
 
             synchronized (juecesQueMarcaronIncidencia) {
                 if (juecesQueMarcaronIncidencia.contains(juezId)) {
@@ -223,18 +221,21 @@ public class CelularHandler extends TextWebSocketHandler {
                 juecesQueMarcaronIncidencia.add(juezId);
                 incidenciasTemp++;
 
-                broadcast("INCIDENCIAS:" + incidenciasTemp + "," + color);
-                celularService.guardarIncidencia(juezId, combateId);
+                System.out.println("Incidencia: Juez " + juezId + " (Total: " + incidenciasTemp + "/" + idsActivos.size() + ") - Combate: " + combateId);
 
-                System.out.println("Incidencia: Juez " + juezId + " para " + color + " (Total: " + incidenciasTemp + ") - Combate: " + combateId);
-
+                // Cuando 2 o más jueces marcan incidencia
                 if (juecesQueMarcaronIncidencia.size() >= 2) {
-                    // 2 o más jueces marcaron incidencia
-                    registrarGamJeom(color, combateId);
+                    System.out.println(" 2+ jueces marcaron incidencia - Notificando al tablero - Combate: " + combateId);
 
-                    broadcast("HABILITAR_PUNTOS");
+                    // Notificar al tablero para que muestre popup y pause el tiempo
+                    tableroHandler.notificarIncidenciaConfirmada(combateId);
+
+                    // Registrar advertencia
                     celularService.registrarAdvertencia(combateId);
-                    System.out.println("GAM-JEOM agregado a " + color + " (2+ incidencias) - Combate: " + combateId);
+
+                    // Limpiar para el siguiente round
+                    juecesQueMarcaronIncidencia.clear();
+                    incidenciasTemp = 0;
                 }
             }
             return;
@@ -273,8 +274,9 @@ public class CelularHandler extends TextWebSocketHandler {
     }
 
     private void calcularYEnviarPromedio(String color, Integer combateId) {
-        Map<Integer, Integer> conteoVotos = new HashMap<>(); // valor → cantidad de jueces que lo votaron
+        Map<Integer, Integer> conteoVotos = new HashMap<>();
         int juecesQueVotaron = 0;
+        int juecesQueVotaronNull = 0; //Contador de votos NULL
         int sumaPuntos = 0;
         List<Integer> votosValidos = new ArrayList<>();
 
@@ -286,22 +288,23 @@ public class CelularHandler extends TextWebSocketHandler {
 
                     int voto = puntosTemp.get(juezId);
 
-                    // Contar solo votos válidos (no -1/NULL)
-                    if (voto >= 0 && voto <= 5) {
+                    if (voto == -1) {
+                        // Contar votos NULL
+                        juecesQueVotaronNull++;
+                        System.out.println("Juez " + juezId + " marcó NULL para " + color);
+                    } else if (voto >= 0 && voto <= 5) {
+                        // Contar solo votos válidos (no -1/NULL)
                         votosValidos.add(voto);
                         juecesQueVotaron++;
                         sumaPuntos += voto;
-
-                        // Contar cuántos jueces votaron por este valor
                         conteoVotos.put(voto, conteoVotos.getOrDefault(voto, 0) + 1);
-                    } else {
-                        System.out.println("Juez " + juezId + " marcó NULL para " + color);
                     }
                 }
             }
         }
 
         System.out.println("Jueces que votaron " + color + ": " + juecesQueVotaron + "/" + idsActivos.size());
+        System.out.println("Jueces que votaron NULL: " + juecesQueVotaronNull);
         System.out.println("Votos válidos: " + votosValidos);
         System.out.println("Conteo de votos: " + conteoVotos);
 
@@ -320,9 +323,24 @@ public class CelularHandler extends TextWebSocketHandler {
             return;
         }
 
-        // Se necesitan mínimo 2 jueces con votos válidos (no NULL)
+        // Lógica especial para NULL
+        // Si 2 o más jueces votaron NULL → restar 1 punto
+        if (juecesQueVotaronNull >= 2) {
+            System.out.println(" 2+ jueces votaron NULL - Restando 1 punto de " + color);
+            restarUnPunto(color, combateId);
+
+            // Limpiar y salir
+            puntosTemp.clear();
+            colorTemp.clear();
+            juecesQueMarcaronIncidencia.clear();
+            incidenciasTemp = 0;
+            broadcast("RESET_COMPLETO");
+            return;
+        }
+
+        // Si solo 1 juez votó NULL y no hay suficientes votos válidos
         if (juecesQueVotaron < 2) {
-            System.out.println(" Se necesitan al menos 2 jueces para sumar puntos. Solo " + juecesQueVotaron + " votaron válido.");
+            System.out.println("Se necesitan al menos 2 jueces con votos válidos para sumar puntos. Solo " + juecesQueVotaron + " votaron válido.");
 
             // Limpiar votos temporales sin sumar nada
             puntosTemp.clear();
@@ -351,13 +369,10 @@ public class CelularHandler extends TextWebSocketHandler {
         int puntajeFinal;
 
         if (puntajeConsenso != null) {
-            // Hay consenso: 2 o más jueces coinciden
             puntajeFinal = puntajeConsenso;
             System.out.println("✓ Consenso encontrado: " + maxCoincidencias + " jueces votaron " + puntajeFinal);
         } else {
-            // No hay consenso: calcular promedio
             double promedio = (double) sumaPuntos / juecesQueVotaron;
-
             double parteDecimal = promedio - Math.floor(promedio);
 
             if (parteDecimal < 0.5) {
@@ -371,10 +386,14 @@ public class CelularHandler extends TextWebSocketHandler {
             System.out.println("⚖️ Sin consenso, promedio calculado: " + puntajeFinal + " (de " + promedio + ")");
         }
 
-        System.out.println(" Puntaje final: " + puntajeFinal + " - Combate: " + combateId);
+        System.out.println("🎯 Puntaje final: " + puntajeFinal + " - Combate: " + combateId);
 
-        // Guardar el puntaje final
-        celularService.guardarPromedio(color, puntajeFinal, combateId);
+        // Guardar el puntaje final (solo si es mayor a 0)
+        if (puntajeFinal > 0) {
+            guardarPuntajeMultiple(color, puntajeFinal, combateId);
+        } else {
+            System.out.println(" Puntaje final es 0, no se guarda nada");
+        }
 
         // Limpiar votos temporales
         puntosTemp.clear();
@@ -385,12 +404,114 @@ public class CelularHandler extends TextWebSocketHandler {
         broadcast("RESET_COMPLETO");
     }
 
+    /**
+     *  Resta 1 punto (elimina el último registro) cuando 2+ jueces votan NULL
+     */
+    private void restarUnPunto(String color, Integer combateId) {
+        try {
+            String colorNormalizado = normalizarColor(color);
+
+            // Buscar la participación del color
+            Optional<Participacion> participacionOpt = participacionRepository
+                    .findByCombateIdAndColor(combateId.longValue(), colorNormalizado);
+
+            if (!participacionOpt.isPresent()) {
+                System.out.println("[CelularHandler] ✗ No se encontró participación para color: " + colorNormalizado);
+                return;
+            }
+
+            Participacion participacion = participacionOpt.get();
+            Long alumnoId = participacion.getAlumno().getIdAlumno();
+
+            // Llamar al endpoint para eliminar el último puntaje
+            String url = String.format("http://localhost:8080/apiPuntajes/puntaje/alumno/%d/last", alumnoId);
+
+            System.out.println("[CelularHandler] DELETE (NULL) -> " + url);
+
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    url,
+                    org.springframework.http.HttpMethod.DELETE,
+                    null,
+                    Map.class
+            );
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Map<String, Object> responseData = response.getBody();
+                Long nuevoTotal = ((Number) responseData.get("newCount")).longValue();
+
+                System.out.println("[CelularHandler] ✓ Punto eliminado por NULL - Nuevo total: " + nuevoTotal);
+
+                // Notificar al tablero
+                tableroHandler.notificarCambioPuntaje(combateId, alumnoId, nuevoTotal);
+            }
+
+        } catch (Exception e) {
+            System.out.println("[CelularHandler] ✗ Error restando punto por NULL: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Guarda múltiples registros de 1 punto usando el endpoint correcto
+     */
+    private void guardarPuntajeMultiple(String color, int puntajeFinal, Integer combateId) {
+        try {
+            String colorNormalizado = normalizarColor(color);
+
+            // Buscar la participación del color
+            Optional<Participacion> participacionOpt = participacionRepository
+                    .findByCombateIdAndColor(combateId.longValue(), colorNormalizado);
+
+            if (!participacionOpt.isPresent()) {
+                System.out.println("[CelularHandler] ✗ No se encontró participación para color: " + colorNormalizado);
+                return;
+            }
+
+            Participacion participacion = participacionOpt.get();
+            Long alumnoId = participacion.getAlumno().getIdAlumno();
+
+            System.out.println("[CelularHandler] 💾 Guardando " + puntajeFinal + " puntos para alumno " + alumnoId);
+
+            // Guardar N registros de 1 punto cada uno
+            for (int i = 0; i < puntajeFinal; i++) {
+                String url = String.format(
+                        "http://localhost:8080/apiPuntajes/puntaje/simple?combateId=%d&alumnoId=%d&valorPuntaje=1",
+                        combateId, alumnoId);
+
+                ResponseEntity<String> response = restTemplate.postForEntity(url, null, String.class);
+
+                if (response.getStatusCode().is2xxSuccessful()) {
+                    System.out.println("[CelularHandler] ✓ Registro " + (i + 1) + "/" + puntajeFinal + " guardado");
+                } else {
+                    System.out.println("[CelularHandler] ✗ Error guardando registro " + (i + 1));
+                }
+            }
+
+            // Obtener el nuevo total y notificar al tablero
+            String countUrl = String.format("http://localhost:8080/apiPuntajes/puntaje/alumno/%d/count", alumnoId);
+            ResponseEntity<Map> countResponse = restTemplate.getForEntity(countUrl, Map.class);
+
+            if (countResponse.getStatusCode().is2xxSuccessful()) {
+                Map<String, Object> countData = countResponse.getBody();
+                Long nuevoTotal = ((Number) countData.get("count")).longValue();
+
+                System.out.println("[CelularHandler]  Nuevo total para alumno " + alumnoId + ": " + nuevoTotal);
+
+                // Notificar al tablero
+                tableroHandler.notificarCambioPuntaje(combateId, alumnoId, nuevoTotal);
+            }
+
+        } catch (Exception e) {
+            System.out.println("[CelularHandler] ✗ Error guardando puntajes: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     private Integer extraerCombateIdDeUrl(WebSocketSession session) {
         try {
             URI uri = session.getUri();
             if (uri != null) {
                 String path = uri.getPath();
-                // Espera formato: /ws/juez/{combateId}
                 String[] partes = path.split("/");
                 if (partes.length >= 3) {
                     return Integer.parseInt(partes[partes.length - 1]);
@@ -402,13 +523,9 @@ public class CelularHandler extends TextWebSocketHandler {
         return null;
     }
 
-    /**
-     * Notifica al tablero del estado de los jueces conectados
-     */
     private void notificarEstadoJuecesAlTablero(Integer combateId) {
         if (combateId == null || tableroHandler == null) return;
 
-        // Obtener lista de jueces activos
         List<Integer> juecesConectados = new ArrayList<>(idsActivos);
 
         System.out.println("[CelularHandler] Notificando al tablero - Combate: " + combateId +
@@ -417,46 +534,6 @@ public class CelularHandler extends TextWebSocketHandler {
         tableroHandler.notificarEstadoJueces(combateId, juecesConectados);
     }
 
-    /**
-     * Registra una falta GAM-JEOM cuando 2 o más jueces marcan incidencia
-     */
-    private void registrarGamJeom(String color, Integer combateId) {
-        try {
-            String colorNormalizado = normalizarColor(color);
-
-            // Buscar la participación del color
-            Optional<Participacion> participacionOpt = participacionRepository
-                    .findByCombateIdAndColor(combateId.longValue(), colorNormalizado);
-
-            if (!participacionOpt.isPresent()) {
-                System.out.println("[CelularHandler] ✗ No se encontró participación para: " + colorNormalizado);
-                return;
-            }
-
-            Participacion participacion = participacionOpt.get();
-            Long alumnoId = participacion.getAlumno().getIdAlumno();
-
-            // Llamar a la API para sumar GAM-JEOM
-            String url = String.format("http://localhost:8080/apiGamJeom/falta/simple?combateId=%d&alumnoId=%d",
-                    combateId, alumnoId);
-
-            System.out.println("[CelularHandler] POST GAM-JEOM -> " + url);
-
-            ResponseEntity<String> response = restTemplate.postForEntity(url, null, String.class);
-
-            if (response.getStatusCode().is2xxSuccessful()) {
-                System.out.println("[CelularHandler] ✓ GAM-JEOM registrado para " + colorNormalizado);
-            }
-
-        } catch (Exception e) {
-            System.out.println("[CelularHandler] ✗ Error registrando GAM-JEOM: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Normaliza el color a ROJO o AZUL
-     */
     private String normalizarColor(String color) {
         if (color == null) return "";
         String c = color.trim().toUpperCase();

@@ -22,4 +22,7 @@ public interface ParticipacionRepository extends JpaRepository<Participacion, Pa
                                                     @Param("colorUpper") String colorUpper);
 
     List<Participacion> findByCombate_IdCombate(Integer idCombate);
+
+    List<Participacion> findByCombateIdCombate(Integer idCombate);
+
 }

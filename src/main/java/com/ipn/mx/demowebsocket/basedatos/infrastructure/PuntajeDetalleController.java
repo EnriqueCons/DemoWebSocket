@@ -68,7 +68,7 @@ public class PuntajeDetalleController {
         );
     }
 
-    // ⭐ CORREGIDO: Agregar puntaje con solo IDs usando getReference
+    // CORREGIDO: Agregar puntaje con solo IDs usando getReference
     @PostMapping("/puntaje/simple")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> saveSimple(
@@ -79,7 +79,7 @@ public class PuntajeDetalleController {
         PuntajeDetalle pd = new PuntajeDetalle();
         pd.setValorPuntaje(valorPuntaje);
 
-        // ⭐ USAR getReference para obtener referencia sin cargar entidad
+        // USAR getReference para obtener referencia sin cargar entidad
         Combate combate = em.getReference(Combate.class, combateId.intValue());
         pd.setCombate(combate);
 

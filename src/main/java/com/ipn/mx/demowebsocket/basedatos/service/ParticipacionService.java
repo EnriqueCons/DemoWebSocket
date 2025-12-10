@@ -9,4 +9,7 @@ public interface ParticipacionService {
     Participacion read(ParticipacionId id);
     Participacion save(Participacion participacion);
     void delete(ParticipacionId id);
+
+    List<Participacion> findByCombateId(Integer idCombate);
+
 }

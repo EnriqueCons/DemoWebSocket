@@ -58,7 +58,7 @@ public class GamJeomController {
             @PathVariable Long combateId) {
 
         Long count = service.countByAlumnoIdAndCombateId(alumnoId, combateId);
-        boolean descalificado = count >= 5;
+        boolean descalificado = count >= 3;
 
         return Map.of(
                 "alumnoId", alumnoId,
