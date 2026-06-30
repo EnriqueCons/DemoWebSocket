@@ -23,4 +23,6 @@ public interface CombateRepository extends JpaRepository<Combate, Integer> {
 
     Optional<Combate> findByContrasenaCombate(String contrasenaCombate);
 
+
 }
+

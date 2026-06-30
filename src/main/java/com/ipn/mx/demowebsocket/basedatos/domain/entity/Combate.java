@@ -40,10 +40,14 @@ public class Combate implements Serializable {
     @Column(name = "estado", length = 50, nullable = false)
     private String estado;
 
+    @Column(name = "roundActual", columnDefinition = "INT DEFAULT 1")
+    private Integer roundActual = 1;
+
     @PrePersist
     public void prePersist() {
         if (estado == null) estado = "EN_CURSO";
         if (numeroRound == null) numeroRound = 3;
+        if (roundActual == null) roundActual = 1;
     }
 
     // Relación con AreaCombate (padre)

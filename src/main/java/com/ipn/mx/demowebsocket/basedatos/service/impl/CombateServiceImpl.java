@@ -4,6 +4,7 @@ import com.ipn.mx.demowebsocket.basedatos.domain.entity.Combate;
 import com.ipn.mx.demowebsocket.basedatos.domain.repository.CombateRepository;
 import com.ipn.mx.demowebsocket.basedatos.service.CombateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,8 +12,12 @@ import java.util.List;
 
 @Service
 public class CombateServiceImpl implements CombateService {
+
     @Autowired
     private CombateRepository combateRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -29,6 +34,16 @@ public class CombateServiceImpl implements CombateService {
     @Override
     @Transactional
     public Combate save(Combate combate) {
+
+        if (combate.getContrasenaCombate() != null
+                && !combate.getContrasenaCombate().isBlank()
+                && !combate.getContrasenaCombate().startsWith("$2")) {
+
+            combate.setContrasenaCombate(
+                    passwordEncoder.encode(combate.getContrasenaCombate())
+            );
+        }
+
         return combateRepository.save(combate);
     }
 
@@ -57,5 +72,4 @@ public class CombateServiceImpl implements CombateService {
     public List<Combate> findByTorneoId(Integer idTorneo) {
         return combateRepository.findByAreaCombate_Torneo_IdTorneo(idTorneo);
     }
-
 }

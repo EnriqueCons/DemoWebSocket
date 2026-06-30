@@ -8,10 +8,9 @@ public interface PuntajeDetalleService {
     PuntajeDetalle read(Long id);
     PuntajeDetalle save(PuntajeDetalle puntajeDetalle);
     void delete(Long id);
-
     Long countByAlumnoId(Long alumnoId);
-
     boolean deleteLastByAlumnoId(Long alumnoId);
-
+    List<PuntajeDetalle> findByCombateId(Integer combateId);
+    List<PuntajeDetalle> findByCombateIdAndAlumnoId(Integer combateId, Long alumnoId);
 
 }

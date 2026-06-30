@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,6 +36,7 @@ public class CombateController {
     @Autowired private CombateJuezRepository combateJuezRepo;
     private final PendingConnectionRegistry pendingConnectionRegistry;
     @Autowired private TorneoService torneoService;
+    @Autowired private PasswordEncoder passwordEncoder;
     @PersistenceContext
     private EntityManager em;
 
@@ -118,6 +120,7 @@ public class CombateController {
         c.setHoraCombate(toLocalDateTime(body.get("horaCombate")));       // "YYYY-MM-DDTHH:mm:ss"
         c.setEstado(strOrDefault(body.get("estado"), "EN_CURSO"));
         c.setContrasenaCombate(str(body.get("contrasenaCombate")));
+        c.setRoundActual(1);
         c = combateService.save(c);
 
         // 4) Crear Participaciones (ROJO / AZUL) enlazando alumnos con combate
@@ -164,6 +167,7 @@ public class CombateController {
         resp.put("area", area.getNombreArea());
         resp.put("estado", c.getEstado());
         resp.put("contrasenaCombate", c.getContrasenaCombate());
+        resp.put("roundActual", c.getRoundActual());
 
         if (torneo != null) {
             resp.put("idTorneo", torneo.getIdTorneo());
@@ -185,8 +189,6 @@ public class CombateController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Combate con id " + id + " no encontrado.");
         }
     }
-
-    // Agregar estos métodos a tu CombateController
 
     @GetMapping("/combates")
     public ResponseEntity<List<Map<String, Object>>> getAllCombates() {
@@ -243,6 +245,9 @@ public class CombateController {
         if (body.containsKey("area") && combate.getAreaCombate() != null) {
             combate.getAreaCombate().setNombreArea(String.valueOf(body.get("area")));
         }
+        if (body.containsKey("roundActual")) {
+            combate.setRoundActual(intOrNull(body.get("roundActual")));
+        }
 
         combate = combateService.save(combate);
         return ResponseEntity.ok(combateToMap(combate));
@@ -267,6 +272,25 @@ public class CombateController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/combates/actual")
+    public ResponseEntity<Map<String, Object>> getCombateActual() {
+        List<Combate> enCurso = combateService.findByEstado("EN_CURSO");
+        Combate combateActual = null;
+        if (!enCurso.isEmpty()) {
+            combateActual = enCurso.get(0);
+        }  else {
+                List<Combate> finalizados =
+                        combateService.findByEstado("FINALIZADO");
+                if (!finalizados.isEmpty()) {
+                    combateActual = finalizados.get(0);
+                }
+            }
+        if (combateActual == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(combateToMap(combateActual));
+    }
+
     @GetMapping("/combates/torneo/{idTorneo}")
     public ResponseEntity<List<Map<String, Object>>> getCombatesByTorneo(@PathVariable Integer idTorneo) {
         List<Combate> combates = combateService.findByTorneoId(idTorneo);
@@ -276,7 +300,48 @@ public class CombateController {
         return ResponseEntity.ok(response);
     }
 
-    // Método helper para convertir Combate a Map
+    // [MT] ---------------- nuevo endpoint para la contraseña -------------------
+    @PostMapping("/combate/{id}/validar")
+    public ResponseEntity<Boolean> validarContrasena(
+            @PathVariable Integer id,
+            @RequestBody Map<String, String> body) {
+
+        Combate combate = combateService.read(id);
+
+        if (combate == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        boolean valida = passwordEncoder.matches(
+                body.get("contrasena"),
+                combate.getContrasenaCombate()
+        );
+
+        return ResponseEntity.ok(valida);
+    }
+
+
+    // [MT] ---------------- nuevo endpoint PATCH para actualizar solo roundActual -------------------
+    @PatchMapping("/combate/{id}/round")
+    @Transactional
+    public ResponseEntity<Map<String, Object>> updateRoundActual(
+            @PathVariable Integer id,
+            @RequestParam Integer roundActual) {
+
+        Combate combate = combateService.read(id);
+        if (combate == null) {
+            return ResponseEntity.notFound().build();
+        }
+        combate.setRoundActual(roundActual);
+        combateService.save(combate);
+
+        return ResponseEntity.ok(Map.of(
+                "idCombate", id,
+                "roundActual", roundActual
+        ));
+    }
+
+    // Metodo helper para convertir Combate a Map
     private Map<String, Object> combateToMap(Combate c) {
         Map<String, Object> map = new HashMap<>();
         map.put("idCombate", c.getIdCombate());
@@ -286,6 +351,7 @@ public class CombateController {
         map.put("horaCombate", c.getHoraCombate());
         map.put("estado", c.getEstado());
         map.put("contrasenaCombate", c.getContrasenaCombate());
+        map.put("roundActual", c.getRoundActual());
 
         // Área - CORREGIDO: usar idAreaCombate
         if (c.getAreaCombate() != null) {
@@ -293,8 +359,9 @@ public class CombateController {
             map.put("idArea", c.getAreaCombate().getIdAreaCombate());  // CAMBIO AQUÍ
         }
 
-        if (c.getAreaCombate().getTorneo() != null) {
-            map.put("idTorneo", c.getAreaCombate().getTorneo().getIdTorneo());
+        AreaCombate area = c.getAreaCombate();
+        if (area != null && area.getTorneo() != null) {
+            map.put("idTorneo", area.getTorneo().getIdTorneo());
         }
 
         // Participaciones (competidores)

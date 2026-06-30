@@ -3,6 +3,7 @@ package com.ipn.mx.demowebsocket.basedatos.domain.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -30,4 +31,24 @@ public class PuntajeDetalle {
     @JoinColumn(name = "idAlumno")
     @JsonBackReference("alumno-puntajes")
     private Alumno alumno;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idTipoPuntaje")
+    private TipoPuntaje tipoPuntaje;
+
+    @Column(name = "roundNumero", columnDefinition = "INT DEFAULT 1")
+    private Integer roundNumero = 1;
+
+    @Column(name = "fechaRegistro", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime fechaRegistro;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaRegistro == null) {
+            this.fechaRegistro = LocalDateTime.now();
+        }
+        if (this.roundNumero == null) {
+            this.roundNumero = 1;
+        }
+    }
 }

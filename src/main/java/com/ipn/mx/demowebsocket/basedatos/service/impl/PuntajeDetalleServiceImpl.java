@@ -58,10 +58,10 @@ public class PuntajeDetalleServiceImpl implements PuntajeDetalleService {
     @Override
     @Transactional
     public boolean deleteLastByAlumnoId(Long alumnoId) {
-        Optional<PuntajeDetalle> last = puntajeDetalleRepository.findTopByAlumnoIdAlumnoOrderByIdPuntajeDesc(alumnoId);
+        List<PuntajeDetalle> lista = puntajeDetalleRepository.findByAlumnoIdOrderByIdDesc(alumnoId);
 
-        if (last.isPresent()) {
-            puntajeDetalleRepository.delete(last.get());
+        if (!lista.isEmpty()) {
+            puntajeDetalleRepository.delete(lista.get(0));
             System.out.println(" Eliminado último puntaje del alumno " + alumnoId);
             return true;
         }
@@ -69,4 +69,17 @@ public class PuntajeDetalleServiceImpl implements PuntajeDetalleService {
         System.out.println(" No hay puntajes para eliminar del alumno " + alumnoId);
         return false;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PuntajeDetalle> findByCombateId(Integer combateId) {
+        return puntajeDetalleRepository.findByCombateId(combateId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PuntajeDetalle> findByCombateIdAndAlumnoId(Integer combateId, Long alumnoId) {
+        return puntajeDetalleRepository.findByCombateIdAndAlumnoId(combateId, alumnoId);
+    }
+
 }
